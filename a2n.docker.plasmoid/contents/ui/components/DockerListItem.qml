@@ -30,7 +30,12 @@ PlasmaExtras.ExpandableListItem {
     "Size": "transform-scale",
     "Volumes": "disk-quota",
     "Networks": "network-wired-activated",
-    "Ports": "kdeconnect-tray"
+    "Ports": "kdeconnect-tray",
+    "CPU": "utilities-system-monitor",
+    "Mem": "memory",
+    "BlockIO": "drive-harddisk",
+    "NetIO": "network-wired",
+    "PIDs": "system-run"
   }
 
   KQuickControlsAddons.Clipboard {
@@ -45,7 +50,7 @@ PlasmaExtras.ExpandableListItem {
   icon: iconMapping.State
   allowStyledText: true
   title: "<font color='"+(model.isRunning ? Kirigami.Theme.positiveTextColor : Kirigami.Theme.negativeTextColor)+"'>"+model.name+"</font>"
-  subtitle: model.id
+  subtitle: model.id + (model.cpu ? " · CPU " + model.cpu : "") + (model.mem ? " · Mem " + model.mem : "")
 
   isBusy: mainWindow.expanded && full.isUpdating
 
@@ -95,6 +100,36 @@ PlasmaExtras.ExpandableListItem {
       text: `Ports: ${model.ports}`
       icon.name: iconMapping["Ports"]
       onTriggered: copy(model.ports)
+    },
+    Action {
+      enabled: model.cpu !== null
+      text: `CPU: ${model.cpu ?? "--"}`
+      icon.name: iconMapping["CPU"]
+      onTriggered: copy(model.cpu)
+    },
+    Action {
+      enabled: model.mem !== null
+      text: `Mem: ${model.memU ?? "--"} (${model.mem ?? "--"})`
+      icon.name: iconMapping["Mem"]
+      onTriggered: copy(model.memU)
+    },
+    Action {
+      enabled: model.blockio !== null
+      text: `Block I/O: ${model.blockio ?? "--"}`
+      icon.name: iconMapping["BlockIO"]
+      onTriggered: copy(model.blockio)
+    },
+    Action {
+      enabled: model.netio !== null
+      text: `Net I/O: ${model.netio ?? "--"}`
+      icon.name: iconMapping["NetIO"]
+      onTriggered: copy(model.netio)
+    },
+    Action {
+      enabled: model.pid !== null
+      text: `PIDs: ${model.pid ?? "--"}`
+      icon.name: iconMapping["PIDs"]
+      onTriggered: copy(model.pid)
     }
   ]
 

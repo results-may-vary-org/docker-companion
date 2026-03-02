@@ -42,6 +42,12 @@
   <entry name="stopOneCommand" type="String">
     <default>docker stop</default>
   </entry>
+  <entry name="usageCommand" type="String">
+    <default>docker stats --no-stream --format json</default>
+  </entry>
+  <entry name="usageInterval" type="Int">
+    <default>5</default>
+  </entry>
 </group>
 
 <group name="displayConfigPage">

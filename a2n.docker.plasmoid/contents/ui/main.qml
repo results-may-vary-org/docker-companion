@@ -8,6 +8,7 @@ import org.kde.plasma.plasma5support as Plasma5Support
 PlasmoidItem {
   id: main
 
+  property int usageInterval: plasmoid.configuration.usageInterval
   property int intervalConfig: plasmoid.configuration.updateInterval
   property bool dockerIsActive: false
   property string cmdIsActive: plasmoid.configuration.checkActiveCommand
@@ -19,6 +20,7 @@ PlasmoidItem {
   property string cmdStopSocket: plasmoid.configuration.stopSocketCommand // call when stdout of stopdocker is catch
   property string startOneDocker: plasmoid.configuration.startOneCommand
   property string stopOneDocker: plasmoid.configuration.stopOneCommand
+  property string usageCmd: plasmoid.configuration.usageCommand
 
   QtObject {
     id: done
@@ -29,6 +31,10 @@ PlasmoidItem {
 
   function checkIsActive() {
     cmdSource.exec(cmdIsActive)
+  }
+
+  function checkUsage() {
+    cmdSource.exec(usageCmd)
   }
 
   // the brain of the widget
@@ -47,7 +53,8 @@ PlasmoidItem {
     }
 
     onSourceConnected: function (source) {
-      sigIsUpdating(true)
+      // we want silence update for the usage
+      if (source !== usageCmd) sigIsUpdating(true)
       connected(source)
     }
 
@@ -80,13 +87,17 @@ PlasmoidItem {
         done.list = true
       }
 
+      if (cmd === usageCmd) {
+        sigUsage(stdout)
+      }
+
       if (cmd === cmdStopDocker) {
         // stderr is mostly alway a warning for the socket
         cmdSource.exec(cmdStopSocket)
       }
 
       // in any other case than refresh action we refresh the list
-      if (cmd !== cmdListActiveDocker && cmd !== cmdListAllDocker && cmd !== cmdListDocker) {
+      if (cmd !== cmdListActiveDocker && cmd !== cmdListAllDocker && cmd !== cmdListDocker && cmd !== usageCmd) {
         main.checkIsActive()
       }
 
@@ -105,6 +116,7 @@ PlasmoidItem {
       connectSource(cmd)
     }
 
+    signal sigUsage(string usage)
     signal sigIsUpdating(bool status)
     signal sigIsActive(bool active)
     signal sigCountAll(string count)
@@ -122,6 +134,16 @@ PlasmoidItem {
     repeat: true
     triggeredOnStart: true // trigger on start for a first check
     onTriggered: main.checkIsActive()
+  }
+
+  // pool the usage data
+  Timer {
+    id: usageTimer
+    interval: usageInterval * 1000
+    running: true
+    repeat: true
+    triggeredOnStart: true
+    onTriggered: main.checkUsage()
   }
 
   Plasmoid.status: main.dockerIsActive ? PlasmaCore.Types.ActiveStatus : PlasmaCore.Types.PassiveStatus

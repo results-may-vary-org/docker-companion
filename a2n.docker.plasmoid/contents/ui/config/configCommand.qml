@@ -18,6 +18,8 @@ Kirigami.ScrollablePage {
   property alias cfg_stopSocketCommand: stopSocketCommandInput.text
   property alias cfg_startOneCommand: startOneCommandInput.text
   property alias cfg_stopOneCommand: stopOneCommandInput.text
+  property alias cfg_usageCommand: usageCommandInput.text
+  property alias cfg_usageInterval: usageIntervalSpin.value
 
   ColumnLayout {
     anchors {
@@ -111,5 +113,40 @@ Kirigami.ScrollablePage {
         Kirigami.FormData.label: "Stop Docker socket command: "
       }
     }
+
+    Kirigami.FormLayout {
+      Kirigami.Separator {
+        Kirigami.FormData.isSection: true
+        Kirigami.FormData.label: "Usage"
+      }
+    }
+
+    Kirigami.InlineMessage {
+      Layout.fillWidth: true
+      text: "Use this command with caution.\n\nIt's a command that is executed every X seconds and does not provide live values (unfortunately, this is not possible).\n\nI strongly advise you not to set delays of less than 5 seconds to allow time for the command to return a value."
+      visible: true
+      type: Kirigami.MessageType.Warning
+    }
+
+    Kirigami.FormLayout {
+      Controls.SpinBox {
+        id: usageIntervalSpin
+        Kirigami.FormData.label: "Update usage every: "
+        from: 1
+        to: 60
+        editable: true
+        textFromValue: (value) => value + " second(s)"
+        valueFromText: (text) => parseInt(text)
+      }
+    }
+
+    Kirigami.FormLayout {
+      Controls.TextField {
+        id: usageCommandInput
+        Kirigami.FormData.label: "Docker usage command: "
+      }
+    }
+
+
   }
 }

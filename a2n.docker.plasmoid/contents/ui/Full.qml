@@ -20,6 +20,8 @@ PlasmaExtras.Representation {
   Layout.minimumWidth: 200
   Layout.maximumWidth: 400
 
+  property string list: ""
+  property var usage: []
   property string totalActive: "0"
   property string total: "0"
   property bool isActive: false
@@ -48,8 +50,13 @@ PlasmaExtras.Representation {
     }
 
     function onSigList(list) {
+      full.list = list
       dockerListModel.clear()
       injectList(list)
+    }
+
+    function onSigUsage(usage) {
+      updateUsageOnly(usage)
     }
 
     function onExited(cmd, exitCode, exitStatus, stdout, stderr) {
@@ -69,34 +76,35 @@ PlasmaExtras.Representation {
   }
 
   function injectList(list) {
+    // do nothing if no list, 'cause we show nothing
+    if (!list) return
+
     const lines = list.split("\n")
     const datas = []
     for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
+      const line = lines[i]
       if (line.trim() !== "") {
         try {
           const containerData = JSON.parse(line)
-          const name = containerData.Names || "unknown"
-          const id = containerData.ID || "unknown"
-          const status = containerData.Status || "unknown"
-          const state = containerData.State || "unknown"
-          const image = containerData.Image || "unknown"
-          const localVolumes = containerData.LocalVolumes || "unknown"
-          const networks = containerData.Networks || "unknown"
-          const ports = containerData.Ports || "unknown"
-          const size = containerData.Size || "unknown"
-          const isRunning = state === "running"
+          const usageIndex = full.usage.findIndex(el => el.ID === containerData.ID)
+          const usage = usageIndex >= 0 ? full.usage[usageIndex] : null
           datas.push({
-            "name": name,
-            "id": id,
-            "status": status,
-            "state": state,
-            "isRunning": isRunning,
-            "image": image,
-            "localVolumes": localVolumes,
-            "networks": networks,
-            "ports": ports,
-            "size": size
+            "name": containerData.Names || "unknown",
+            "id": containerData.ID || "unknown",
+            "status": containerData.Status || "unknown",
+            "state": containerData.State || "unknown",
+            "isRunning": containerData.State === "running",
+            "image": containerData.Image || "unknown",
+            "localVolumes": containerData.LocalVolumes || "unknown",
+            "networks": containerData.Networks || "unknown",
+            "ports": containerData.Ports || "unknown",
+            "size": containerData.Size || "unknown",
+            "mem": usage ? usage.MemPerc : "",
+            "cpu": usage ? usage.CPUPerc : "",
+            "blockio": usage ? usage.BlockIO : "",
+            "memU": usage ? usage.MemUsage : "",
+            "netio": usage ? usage.NetIO : "",
+            "pid": usage ? usage.PIDs : ""
           })
         } catch (error) {
           console.log("Error parsing JSON line:", error)
@@ -110,6 +118,35 @@ PlasmaExtras.Representation {
       return a.name.localeCompare(b.name)
     })
     dockerListModel.append(datas)
+  }
+
+  // only update the relevant data on the list
+  function updateUsageOnly(usage) {
+    if (!usage || dockerListModel.count === 0) return
+    const usageDatas = []
+    const lines = usage.split("\n")
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim()
+      if (line !== "") {
+        try {
+          usageDatas.push(JSON.parse(line))
+        } catch(e) {
+          console.log("Error parsing usage JSON:", e)
+        }
+      }
+    }
+    full.usage = usageDatas
+    for (let i = 0; i < dockerListModel.count; i++) {
+      const itemId = dockerListModel.get(i).id
+      const usageIndex = usageDatas.findIndex(el => el.ID === itemId)
+      const usage = usageIndex >= 0 ? usageDatas[usageIndex] : ""
+      dockerListModel.setProperty(i, "mem", usage ? usage.MemPerc : "")
+      dockerListModel.setProperty(i, "cpu", usage ? usage.CPUPerc : "")
+      dockerListModel.setProperty(i, "blockio", usage ? usage.BlockIO : "")
+      dockerListModel.setProperty(i, "memU", usage ? usage.MemUsage : "")
+      dockerListModel.setProperty(i, "netio", usage ? usage.NetIO : "")
+      dockerListModel.setProperty(i, "pid", usage ? usage.PIDs : "")
+    }
   }
 
   ListModel { id: dockerListModel }
