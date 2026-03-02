@@ -44,21 +44,35 @@ Go to the 'System Tray Settings' menu and activate it :)
 
 The plasmoid offers several configuration options to customize its behavior and appearance:
 
-| Name                   | Description                                                                                       | Result                                                                                 |
+### Command & Debug
+
+| Name                   | Description                                                                                       | Result/Default                                                                                 |
 |------------------------|---------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------|
-| Command & Debug        |                                                                                                   |                                                                                        |
 | Interval configuration | Set the interval between each execution of the update check function (in seconds)                 | The Docker status is checked each X seconds                                             |
 | Check Active Command   | The command used to check if Docker service is active                                             | Default: `systemctl is-active docker`                                                  |
 | Count Active Command   | The command used to count running containers                                                      | Default: `docker ps -q \| wc -l`                                                       |
 | Count All Command      | The command used to count all containers (including stopped ones)                                 | Default: `docker ps -qa \| wc -l`                                                      |
 | List Command           | The command used to list all containers                                                           | Default: `docker ps --format json -a`                                                  |
-| Display                |                                                                                                   |                                                                                        |
+| Start one docker       | Start one docker, the applet inject is id                                                         | Default: `docker start` + id                                                           |
+| Stop one docker        | Stop one docker, the applet inject is id                                                          | Default: `docker stop` + id                                                            |
+| Start docker service   | Start the docker service, this allow you to launch docker on your system                          | Default: `pkexec systemctl start docker`, `pkexec` ask for the password                |
+| Stop docker service    | Stop the docker service, this allow you to stop docker on your system                             | Default: `pkexec systemctl stop docker.service`, `pkexec` ask for the password         |
+| Stop docker socket     | Stop the docker socket, this command is run automatically after the end of the service            | Default: `pkexec systemctl stop docker.socket`, `pkexec` ask for the password          |
+| Usage update interval  | Set the interval between each execution of the docker usage command (in seconds)                  | Default: 5s                                                                            |
+| Usage command          | Get the usage data for each container                                                             | Default: `docker stats --no-stream --format json`                                      |
+
+### Display
+
+| Name                   | Description                                                                                       | Result/Default                                                                         |
+|------------------------|---------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------|
 | Separate Result        | If you want to show both active and total containers in the label                                 | Sets the label text to `active~total` using the configured separator                   |
 | Separator              | The text you want to use as separator between active and total counts                             | Default: `~`                                                                           |
 | Show a dot             | Replace the label with a colored dot                                                              | If active containers > 0, the dot is visible; otherwise nothing is shown               |
 | Custom dot color       | If you want to customize the color of the dot                                                     | If not checked, the dot gets the color from your theme                                 |
 | Custom dot position    | If you want to customize the position of the dot                                                  | Options: Top Right, Top Left, Bottom Right, Bottom Left                                |
 | Icon color             | If you want to customize the color of the icon                                                    | If not checked, the icon gets the color from your theme                                |
+
+
 
 # Code of conduct, license, authors, changelog, contributing
 
