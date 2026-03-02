@@ -212,12 +212,10 @@ PlasmaExtras.Representation {
       model: dockerListModel
       delegate: Components.DockerListItem {}
       Keys.onDownPressed: event => {
-        console.log("################# down")
         scrollView.incrementCurrentIndex();
         scrollView.currentItem.forceActiveFocus();
       }
       Keys.onUpPressed: event => {
-        console.log("################# up")
         if (scrollView.currentIndex === 0) {
           scrollView.currentIndex = -1;
         } else {
