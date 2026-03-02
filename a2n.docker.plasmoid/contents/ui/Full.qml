@@ -87,23 +87,24 @@ PlasmaExtras.Representation {
           const containerData = JSON.parse(line)
           const usageIndex = full.usage.findIndex(el => el.ID === containerData.ID)
           const usage = usageIndex >= 0 ? full.usage[usageIndex] : null
+          const isRunning = containerData.State === "running"
           datas.push({
             "name": containerData.Names || "unknown",
             "id": containerData.ID || "unknown",
             "status": containerData.Status || "unknown",
             "state": containerData.State || "unknown",
-            "isRunning": containerData.State === "running",
+            "isRunning": isRunning,
             "image": containerData.Image || "unknown",
             "localVolumes": containerData.LocalVolumes || "unknown",
             "networks": containerData.Networks || "unknown",
             "ports": containerData.Ports || "unknown",
             "size": containerData.Size || "unknown",
-            "mem": usage ? usage.MemPerc : "",
-            "cpu": usage ? usage.CPUPerc : "",
-            "blockio": usage ? usage.BlockIO : "",
-            "memU": usage ? usage.MemUsage : "",
-            "netio": usage ? usage.NetIO : "",
-            "pid": usage ? usage.PIDs : ""
+            "mem": usage && isRunning ? usage.MemPerc : "",
+            "cpu": usage && isRunning ? usage.CPUPerc : "",
+            "blockio": usage && isRunning ? usage.BlockIO : "",
+            "memU": usage && isRunning ? usage.MemUsage : "",
+            "netio": usage && isRunning ? usage.NetIO : "",
+            "pid": usage && isRunning ? usage.PIDs : ""
           })
         } catch (error) {
           console.log("Error parsing JSON line:", error)
@@ -177,12 +178,13 @@ PlasmaExtras.Representation {
       const itemId = dockerListModel.get(i).id
       const usageIndex = usageDatas.findIndex(el => el.ID === itemId)
       const usage = usageIndex >= 0 ? usageDatas[usageIndex] : ""
-      dockerListModel.setProperty(i, "mem", usage ? usage.MemPerc : "")
-      dockerListModel.setProperty(i, "cpu", usage ? usage.CPUPerc : "")
-      dockerListModel.setProperty(i, "blockio", usage ? usage.BlockIO : "")
-      dockerListModel.setProperty(i, "memU", usage ? usage.MemUsage : "")
-      dockerListModel.setProperty(i, "netio", usage ? usage.NetIO : "")
-      dockerListModel.setProperty(i, "pid", usage ? usage.PIDs : "")
+      const isRunning = dockerListModel.get(i).isRunning
+      dockerListModel.setProperty(i, "mem", usage && isRunning ? usage.MemPerc : "")
+      dockerListModel.setProperty(i, "cpu", usage && isRunning ? usage.CPUPerc : "")
+      dockerListModel.setProperty(i, "blockio", usage && isRunning ? usage.BlockIO : "")
+      dockerListModel.setProperty(i, "memU", usage && isRunning ? usage.MemUsage : "")
+      dockerListModel.setProperty(i, "netio", usage && isRunning ? usage.NetIO : "")
+      dockerListModel.setProperty(i, "pid", usage && isRunning ? usage.PIDs : "")
     }
   }
 
