@@ -12,7 +12,7 @@
         "Id": "a2n.docker.plasmoid",
         "License": "GPL-3.0+",
         "Name": "Docker companion",
-        "Version": "1.0.0",
+        "Version": "1.1.0",
         "Website": "https://github.com/bouteillerAlan/dockercompanion",
         "Depends": [],
         "EnabledByDefault": false

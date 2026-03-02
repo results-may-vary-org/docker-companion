@@ -9,8 +9,6 @@ import org.kde.plasma.plasmoid
 ColumnLayout {
   id: tooltip
 
-  property var dividerColor: Kirigami.Theme.textColor
-  property var dividerOpacity: 0.1
   property string totalActive: "0"
   property string total: "0"
   property bool isActive: false

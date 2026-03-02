@@ -1,113 +1,128 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <kcfg xmlns="http://www.kde.org/standards/kcfg/1.0"
-xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-xsi:schemaLocation="http://www.kde.org/standards/kcfg/1.0
-http://www.kde.org/standards/kcfg/1.0/kcfg.xsd" >
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.kde.org/standards/kcfg/1.0
+  http://www.kde.org/standards/kcfg/1.0/kcfg.xsd" >
 <kcfgfile name=""/>
 
 <group name="shadow">
-    <entry name="cmdIsRunning" type="Bool">
-        <default>false</default>
-    </entry>
+  <entry name="cmdIsRunning" type="Bool">
+    <default>false</default>
+  </entry>
 </group>
 
 <group name="commandConfigPage">
-    <entry name="updateInterval" type="Int">
-        <default>30</default>
-    </entry>
-    <entry name="checkActiveCommand" type="String">
-        <default>systemctl is-active docker</default>
-    </entry>
-    <entry name="countActiveCommand" type="String">
-        <default>docker ps -q | wc -l</default>
-    </entry>
-    <entry name="countAllCommand" type="String">
-        <default>docker ps -qa | wc -l</default>
-    </entry>
-    <entry name="listCommand" type="String">
-        <default>docker ps --format json -a</default>
-    </entry>
+  <entry name="updateInterval" type="Int">
+    <default>30</default>
+  </entry>
+  <entry name="checkActiveCommand" type="String">
+    <default>systemctl is-active docker</default>
+  </entry>
+  <entry name="countActiveCommand" type="String">
+    <default>docker ps -q | wc -l</default>
+  </entry>
+  <entry name="countAllCommand" type="String">
+    <default>docker ps -qa | wc -l</default>
+  </entry>
+  <entry name="listCommand" type="String">
+    <default>docker ps --format json -a</default>
+  </entry>
+  <entry name="startCommand" type="String">
+    <default>pkexec systemctl start docker</default>
+  </entry>
+  <entry name="stopServiceCommand" type="String">
+    <default>pkexec systemctl stop docker</default>
+  </entry>
+  <entry name="stopSocketCommand" type="String">
+    <default>pkexec systemctl stop docker.socket</default>
+  </entry>
+  <entry name="startOneCommand" type="String">
+    <default>docker start</default>
+  </entry>
+  <entry name="stopOneCommand" type="String">
+    <default>docker stop</default>
+  </entry>
 </group>
 
 <group name="displayConfigPage">
-    <entry name="separateResult" type="Bool">
-        <default>true</default>
-    </entry>
+  <entry name="separateResult" type="Bool">
+    <default>true</default>
+  </entry>
 
-    <entry name="separator" type="String">
-        <default>~</default>
-    </entry>
+  <entry name="separator" type="String">
+    <default>~</default>
+  </entry>
 
-    <entry name="mainDot" type="Bool">
-        <default>false</default>
-    </entry>
+  <entry name="mainDot" type="Bool">
+    <default>false</default>
+  </entry>
 
-    <entry name="mainDotPosition" type="Enum">
-        <choices>
-            <choice name="Top Right" />
-            <choice name="Top Left" />
-            <choice name="Bottom Right" />
-            <choice name="Bottom Left" />
-        </choices>
-        <default>2</default>
-    </entry>
+  <entry name="mainDotPosition" type="Enum">
+    <choices>
+      <choice name="Top Right" />
+      <choice name="Top Left" />
+      <choice name="Bottom Right" />
+      <choice name="Bottom Left" />
+    </choices>
+    <default>2</default>
+  </entry>
 
-    <entry name="mainDotColor" type="String">
-        <default>white</default>
-    </entry>
+  <entry name="mainDotColor" type="String">
+    <default>white</default>
+  </entry>
 
-    <entry name="mainDotUseCustomColor" type="Bool">
-        <default>false</default>
-    </entry>
+  <entry name="mainDotUseCustomColor" type="Bool">
+    <default>false</default>
+  </entry>
 
-    <entry name="iconColor" type="String">
-        <default>white</default>
-    </entry>
+  <entry name="iconColor" type="String">
+    <default>white</default>
+  </entry>
 
-    <entry name="iconUseCustomColor" type="Bool">
-        <default>false</default>
-    </entry>
+  <entry name="iconUseCustomColor" type="Bool">
+    <default>false</default>
+  </entry>
 </group>
 
 <group name="popupConfigPage">
 
-    <entry name="nameUseCustomColor" type="Bool">
-        <default>false</default>
-    </entry>
-    <entry name="nameColor" type="String">
-        <default>white</default>
-    </entry>
+  <entry name="nameUseCustomColor" type="Bool">
+    <default>false</default>
+  </entry>
+  <entry name="nameColor" type="String">
+    <default>white</default>
+  </entry>
 
-    <entry name="sourceUseCustomColor" type="Bool">
-        <default>false</default>
-    </entry>
-    <entry name="sourceColor" type="String">
-        <default>white</default>
-    </entry>
+  <entry name="sourceUseCustomColor" type="Bool">
+    <default>false</default>
+  </entry>
+  <entry name="sourceColor" type="String">
+    <default>white</default>
+  </entry>
 
-    <entry name="separatorUseCustomColor" type="Bool">
-        <default>false</default>
-    </entry>
-    <entry name="separatorColor" type="String">
-        <default>white</default>
-    </entry>
-    <entry name="separatorText" type="String">
-        <default>></default>
-    </entry>
+  <entry name="separatorUseCustomColor" type="Bool">
+    <default>false</default>
+  </entry>
+  <entry name="separatorColor" type="String">
+    <default>white</default>
+  </entry>
+  <entry name="separatorText" type="String">
+    <default>></default>
+  </entry>
 
-    <entry name="fvUseCustomColor" type="Bool">
-        <default>false</default>
-    </entry>
-    <entry name="fvColor" type="String">
-        <default>white</default>
-    </entry>
+  <entry name="fvUseCustomColor" type="Bool">
+    <default>false</default>
+  </entry>
+  <entry name="fvColor" type="String">
+    <default>white</default>
+  </entry>
 
-    <entry name="tvUseCustomColor" type="Bool">
-        <default>false</default>
-    </entry>
-    <entry name="tvColor" type="String">
-        <default>white</default>
-    </entry>
+  <entry name="tvUseCustomColor" type="Bool">
+    <default>false</default>
+  </entry>
+  <entry name="tvColor" type="String">
+    <default>white</default>
+  </entry>
 
 </group>
 

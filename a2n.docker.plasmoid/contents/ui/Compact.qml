@@ -49,11 +49,6 @@ Item {
     }
   }
 
-  // return true if the widget area is vertical
-  function isBarVertical() {
-    return row.width < row.height;
-  }
-
   // generate the text for the count result
   function generateResult() {
     if (onRefresh) return " ↻ "
@@ -95,7 +90,7 @@ Item {
 
     // MAIN BR
     Rectangle {
-      visible: totalActive > 0 && mainDotPosition === 2
+      visible: mainDot && totalActive > 0 && mainDotPosition === 2
       height: container.height / 2.5
       width: height
       radius: height / 2
@@ -108,7 +103,7 @@ Item {
 
     // MAIN BL
     Rectangle {
-      visible: totalActive > 0 && mainDotPosition === 3
+      visible: mainDot && totalActive > 0 && mainDotPosition === 3
       height: container.height / 2.5
       width: height
       radius: height / 2
@@ -121,7 +116,7 @@ Item {
 
     // MAIN TR
     Rectangle {
-      visible: totalActive > 0 && mainDotPosition === 0
+      visible: mainDot && totalActive > 0 && mainDotPosition === 0
       height: container.height / 2.5
       width: height
       radius: height / 2
@@ -134,7 +129,7 @@ Item {
 
     // MAIN TL
     Rectangle {
-      visible: totalActive > 0 && mainDotPosition === 1
+      visible: mainDot && totalActive > 0 && mainDotPosition === 1
       height: container.height / 2.5
       width: height
       radius: height / 2

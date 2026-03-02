@@ -20,11 +20,8 @@ PlasmaExtras.Representation {
   Layout.minimumWidth: 200
   Layout.maximumWidth: 400
 
-  property var dividerColor: Kirigami.Theme.textColor
-  property var dividerOpacity: 0.1
   property string totalActive: "0"
   property string total: "0"
-  property string dockerList: ""
   property bool isActive: false
   property bool isUpdating: false
   property bool onError: false
@@ -32,32 +29,43 @@ PlasmaExtras.Representation {
 
   Connections {
     target: cmdSource
+
     function onSigIsUpdating(status) {
       full.isUpdating = status
     }
+
     function onSigIsActive(active) {
       full.isActive = active
+      if (!active) dockerListModel.clear() // clear the list on exit
     }
+
     function onSigCountAll(count) {
       full.total = count
     }
+
     function onSigCountActive(count) {
       full.totalActive = count
     }
+
     function onSigList(list) {
       dockerListModel.clear()
       injectList(list)
     }
+
     function onExited(cmd, exitCode, exitStatus, stdout, stderr) {
       if (stderr !== '') {
         full.onError = true
         full.errorMessage = stderr
+      } else {
+        full.onError = false
+        full.errorMessage = ""
       }
     }
   }
 
+  // !isActive force refresh when we open the full view
   function refresh() {
-    if (!isActive  ) main.checkIsActive()
+    if (!isActive) main.checkIsActive()
   }
 
   function injectList(list) {
@@ -129,13 +137,32 @@ PlasmaExtras.Representation {
       spacing: 0
 
       PlasmaComponents.BusyIndicator {
-        id: busyIndicatorUpdateIcon
-        visible: isUpdating && dockerList !== ""
-      }
-
-      PlasmaComponents.BusyIndicator {
         id: busyIndicatorCheckUpdatesIcon
         visible: isUpdating
+      }
+
+      PlasmaComponents.ToolButton {
+        height: Kirigami.Units.iconSizes.medium
+        icon.name: "media-playback-start"
+        display: PlasmaComponents.AbstractButton.IconOnly
+        text: i18n("Start Docker service")
+        visible: !isActive && !isUpdating
+        onClicked: cmdSource.exec(main.cmdStartDocker)
+        PlasmaComponents.ToolTip {
+          text: parent.text
+        }
+      }
+
+      PlasmaComponents.ToolButton {
+        height: Kirigami.Units.iconSizes.medium
+        icon.name: "media-playback-stop"
+        display: PlasmaComponents.AbstractButton.IconOnly
+        text: i18n("Stop Docker service")
+        visible: isActive && !isUpdating
+        onClicked: cmdSource.exec(main.cmdStopDocker)
+        PlasmaComponents.ToolTip {
+          text: parent.text
+        }
       }
 
       PlasmaComponents.ToolButton {
@@ -191,7 +218,7 @@ PlasmaExtras.Representation {
     id: upToDateLabel
     text: i18n("Docker is not running !")
     anchors.centerIn: parent
-    visible: !isActive && dockerList === "" && !onError
+    visible: !isActive && !onError
   }
 
   // if an error happened

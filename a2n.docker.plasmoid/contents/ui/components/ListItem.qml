@@ -16,6 +16,9 @@ import org.kde.plasma.plasmoid
 PlasmaExtras.ExpandableListItem {
   id: dockerItem
 
+  property string startOneDocker: plasmoid.configuration.startOneCommand
+  property string stopOneDocker: plasmoid.configuration.stopOneCommand
+
   property var iconMapping: {
     "ID": "username-copy",
     "Image": "kpackagekit-updates",
@@ -40,7 +43,6 @@ PlasmaExtras.ExpandableListItem {
   allowStyledText: true
   title: "<font color='"+(isRunning ? Kirigami.Theme.positiveTextColor : Kirigami.Theme.negativeTextColor)+"'>"+name+"</font>"
   subtitle: id
-  isBusy: mainWindow.expanded && main.isOnUpdate
 
   // btn next to header
   defaultActionButtonAction: Action {
@@ -48,7 +50,7 @@ PlasmaExtras.ExpandableListItem {
     enabled: true
     icon.name: isRunning ? "media-playback-stop" : "media-playback-start"
     text: isRunning ? i18n("Stop") : i18n("Start")
-    onTriggered: isRunning ? cmdSource.exec(`docker stop ${id}`) : cmdSource.exec(`docker start ${id}`)
+    onTriggered: isRunning ? cmdSource.exec(`${stopOneDocker} ${id}`) : cmdSource.exec(`${startOneDocker} ${id}`)
   }
   showDefaultActionButtonWhenBusy: false
 

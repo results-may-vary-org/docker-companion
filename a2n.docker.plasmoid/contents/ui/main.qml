@@ -9,14 +9,23 @@ PlasmoidItem {
   id: main
 
   property int intervalConfig: plasmoid.configuration.updateInterval
-  property bool isOnUpdate: false
   property bool dockerIsActive: false
-  property string totalDocker: "0"
-  property string listDocker: ""
   property string cmdIsActive: plasmoid.configuration.checkActiveCommand
   property string cmdListActiveDocker: plasmoid.configuration.countActiveCommand
   property string cmdListAllDocker: plasmoid.configuration.countAllCommand
   property string cmdListDocker: plasmoid.configuration.listCommand
+  property string cmdStartDocker: plasmoid.configuration.startCommand
+  property string cmdStopDocker: plasmoid.configuration.stopServiceCommand
+  property string cmdStopSocket: plasmoid.configuration.stopSocketCommand // call when stdout of stopdocker is catch
+  property string startOneDocker: plasmoid.configuration.startOneCommand
+  property string stopOneDocker: plasmoid.configuration.stopOneCommand
+
+  QtObject {
+    id: done
+    property bool countAll: false
+    property bool countActive: false
+    property bool list: false
+  }
 
   function checkIsActive() {
     cmdSource.exec(cmdIsActive)
@@ -56,11 +65,36 @@ PlasmoidItem {
         }
       }
 
-      if (main.dockerIsActive && cmd === cmdListAllDocker) sigCountAll(stdout.replace(/\n/g, ''))
+      if (main.dockerIsActive && cmd === cmdListAllDocker) {
+        sigCountAll(stdout.replace(/\n/g, ''))
+        done.countAll = true
+      }
 
-      if (main.dockerIsActive && cmd === cmdListActiveDocker) sigCountActive(stdout.replace(/\n/g, ''))
+      if (main.dockerIsActive && cmd === cmdListActiveDocker) {
+        sigCountActive(stdout.replace(/\n/g, ''))
+        done.countActive = true
+      }
 
-      if (main.dockerIsActive && cmd === cmdListDocker) sigList(stdout)
+      if (main.dockerIsActive && cmd === cmdListDocker) {
+        sigList(stdout)
+        done.list = true
+      }
+
+      if (cmd === cmdStopDocker) {
+        // stderr is mostly alway a warning for the socket
+        cmdSource.exec(cmdStopSocket)
+      }
+
+      // in any other case than refresh action we refresh the list
+      if (cmd !== cmdListActiveDocker && cmd !== cmdListAllDocker && cmd !== cmdListDocker) {
+        main.checkIsActive()
+      }
+
+      if (done.list && done.countAll && done.countActive) {
+        done.list = false
+        done.countActive = false
+        done.countAll = false
+      }
 
       sigIsUpdating(false)
     }
@@ -101,9 +135,19 @@ PlasmoidItem {
     PlasmaCore.Action {
       text: i18n("Refresh")
       icon.name: "view-refresh-symbolic"
-      onTriggered: {
-        main.checkIsActive()
-      }
+      onTriggered: main.checkIsActive()
+    },
+    PlasmaCore.Action {
+      text: i18n("Start Docker")
+      icon.name: "media-playback-start"
+      enabled: !main.dockerIsActive
+      onTriggered: cmdSource.exec(cmdStartDocker)
+    },
+    PlasmaCore.Action {
+      text: i18n("Stop Docker")
+      icon.name: "media-playback-stop"
+      enabled: main.dockerIsActive
+      onTriggered: cmdSource.exec(cmdStopDocker)
     }
   ]
 

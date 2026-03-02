@@ -73,14 +73,17 @@ Kirigami.ScrollablePage {
                 id: mainDot
                 Kirigami.FormData.label: "Show a dot in place of the label: "
                 checked: false
+                onCheckedChanged: if (checked) separateResult.checked = false
             }
 
             RowLayout {
                 Kirigami.FormData.label: "Custom main dot options: "
                 visible: mainDot.checked
+
                 Controls.CheckBox {
                     id: mainDotUseCustomColor
                     checked: false
+                    enabled: !separateResult.checked
                 }
 
                 KQuickControls.ColorButton {
@@ -90,7 +93,6 @@ Kirigami.ScrollablePage {
 
                 Controls.ComboBox {
                     id: mainDotPosition
-                    enabled: mainDot.checked
                     model: ["Top Right", "Top Left", "Bottom Right", "Bottom Left"]
                     onActivated: cfg_mainDotPosition = index
                 }
@@ -111,6 +113,7 @@ Kirigami.ScrollablePage {
                 id: separateResult
                 Kirigami.FormData.label: "Show started and stopped count: "
                 checked: false
+                onCheckedChanged: if (checked) mainDot.checked = false
             }
 
             Controls.TextField {

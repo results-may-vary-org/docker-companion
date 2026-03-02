@@ -13,6 +13,11 @@ Kirigami.ScrollablePage {
   property alias cfg_countActiveCommand: countActiveCommandInput.text
   property alias cfg_countAllCommand: countAllCommandInput.text
   property alias cfg_listCommand: listCommandInput.text
+  property alias cfg_startCommand: startCommandInput.text
+  property alias cfg_stopServiceCommand: stopServiceCommandInput.text
+  property alias cfg_stopSocketCommand: stopSocketCommandInput.text
+  property alias cfg_startOneCommand: startOneCommandInput.text
+  property alias cfg_stopOneCommand: stopOneCommandInput.text
 
   ColumnLayout {
     anchors {
@@ -42,15 +47,13 @@ Kirigami.ScrollablePage {
     }
 
     Kirigami.FormLayout {
-      wideMode: false
       Kirigami.Separator {
         Kirigami.FormData.isSection: true
-        Kirigami.FormData.label: "Checck & count"
+        Kirigami.FormData.label: "Check & count"
       }
     }
 
     Kirigami.FormLayout {
-      wideMode: false
       Controls.TextField {
         id: checkActiveCommandInput
         Kirigami.FormData.label: "Check if docker is running command: "
@@ -66,6 +69,46 @@ Kirigami.ScrollablePage {
       Controls.TextField {
         id: listCommandInput
         Kirigami.FormData.label: "List containers command: "
+      }
+    }
+
+    Kirigami.FormLayout {
+      Kirigami.Separator {
+        Kirigami.FormData.isSection: true
+        Kirigami.FormData.label: "Docker control"
+      }
+    }
+
+    Kirigami.FormLayout {
+      Controls.TextField {
+        id: startOneCommandInput
+        Kirigami.FormData.label: "Start one docker command: "
+      }
+      Controls.TextField {
+        id: stopOneCommandInput
+        Kirigami.FormData.label: "Stop one docker command: "
+      }
+    }
+
+    Kirigami.FormLayout {
+      Kirigami.Separator {
+        Kirigami.FormData.isSection: true
+        Kirigami.FormData.label: "Service control"
+      }
+    }
+
+    Kirigami.FormLayout {
+      Controls.TextField {
+        id: startCommandInput
+        Kirigami.FormData.label: "Start Docker service command: "
+      }
+      Controls.TextField {
+        id: stopServiceCommandInput
+        Kirigami.FormData.label: "Stop Docker service command: "
+      }
+      Controls.TextField {
+        id: stopSocketCommandInput
+        Kirigami.FormData.label: "Stop Docker socket command: "
       }
     }
   }

@@ -4,6 +4,7 @@ import QtQuick.Controls as Controls
 import org.kde.kirigami as Kirigami
 import org.kde.kquickcontrols as KQuickControls
 
+// FIXME: entire page appears to be leftover from a package manager widget; generateName/generateVersion reference "PackageName"/"1.0.0 → 2.0.0" and none of the color config values (nameColor, sourceColor, fvColor, tvColor) are read anywhere in the plasmoid UI
 Kirigami.ScrollablePage {
 
     id: popupConfigPage
