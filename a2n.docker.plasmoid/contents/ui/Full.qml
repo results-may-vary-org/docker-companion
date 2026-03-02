@@ -192,25 +192,38 @@ PlasmaExtras.Representation {
   }
 
   // page view for the list
-  Kirigami.ScrollablePage {
+  PlasmaComponents.ScrollView {
     id: scrollView
     visible: !isUpdating && !onError
-    background: Rectangle {
-      anchors.fill: parent
-      color: "transparent"
-    }
     anchors.top: headerSeparator.bottom
     anchors.bottom: parent.bottom
     anchors.left: parent.left
     anchors.right: parent.right
-    ListView {
+    contentItem: ListView {
       id: packageView
-      anchors.rightMargin: Kirigami.Units.gridUnit
-      model: dockerListModel
+      anchors.fill: parent
+      focus: true
+      currentIndex: -1
+      clip: true
+      boundsBehavior: Flickable.StopAtBounds
       highlight: PlasmaExtras.Highlight {}
       highlightMoveDuration: Kirigami.Units.shortDuration
       highlightResizeDuration: Kirigami.Units.shortDuration
-      delegate: Components.ListItem {}
+      model: dockerListModel
+      delegate: Components.DockerListItem {}
+      Keys.onDownPressed: event => {
+        console.log("################# down")
+        scrollView.incrementCurrentIndex();
+        scrollView.currentItem.forceActiveFocus();
+      }
+      Keys.onUpPressed: event => {
+        console.log("################# up")
+        if (scrollView.currentIndex === 0) {
+          scrollView.currentIndex = -1;
+        } else {
+          event.accepted = false;
+        }
+      }
     }
   }
 
