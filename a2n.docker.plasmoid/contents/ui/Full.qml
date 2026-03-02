@@ -51,7 +51,6 @@ PlasmaExtras.Representation {
 
     function onSigList(list) {
       full.list = list
-      dockerListModel.clear()
       injectList(list)
     }
 
@@ -117,7 +116,45 @@ PlasmaExtras.Representation {
       }
       return a.name.localeCompare(b.name)
     })
-    dockerListModel.append(datas)
+
+    // first load: nothing to diff
+    if (dockerListModel.count === 0) {
+      dockerListModel.append(datas)
+      return
+    }
+
+    // remove stale items (backward to avoid index shifting)
+    for (let i = dockerListModel.count - 1; i >= 0; i--) {
+      if (!datas.find(d => d.id === dockerListModel.get(i).id)) {
+        dockerListModel.remove(i)
+      }
+    }
+
+    // update existing items in-place, insert new ones
+    for (let i = 0; i < datas.length; i++) {
+      let modelIndex = -1
+      for (let j = 0; j < dockerListModel.count; j++) {
+        if (dockerListModel.get(j).id === datas[i].id) {
+          modelIndex = j
+          break
+        }
+      }
+      if (modelIndex >= 0) {
+        dockerListModel.set(modelIndex, datas[i])
+      } else {
+        dockerListModel.insert(i, datas[i])
+      }
+    }
+
+    // re-sort using move() — preserves delegates
+    for (let i = 0; i < datas.length; i++) {
+      for (let j = 0; j < dockerListModel.count; j++) {
+        if (dockerListModel.get(j).id === datas[i].id) {
+          if (j !== i) dockerListModel.move(j, i, 1)
+          break
+        }
+      }
+    }
   }
 
   // only update the relevant data on the list
