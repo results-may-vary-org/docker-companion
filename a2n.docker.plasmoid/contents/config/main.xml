@@ -88,6 +88,14 @@
   <entry name="iconUseCustomColor" type="Bool">
     <default>false</default>
   </entry>
+
+  <entry name="wrapText" type="Bool">
+    <default>false</default>
+  </entry>
+
+  <entry name="widthFit" type="Bool">
+    <default>false</default>
+  </entry>
 </group>
 
 <group name="popupConfigPage">

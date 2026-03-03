@@ -19,6 +19,9 @@ Kirigami.ScrollablePage {
     property alias cfg_iconColor: iconColor.color
     property alias cfg_iconUseCustomColor: iconUseCustomColor.checked
 
+    property alias cfg_wrapText: wrapText.checked
+    property alias cfg_widthFit: widthFit.checked
+
     ColumnLayout {
 
         anchors {
@@ -51,6 +54,41 @@ Kirigami.ScrollablePage {
                 }
             }
 
+        }
+
+        Kirigami.FormLayout {
+            wideMode: false
+
+            Kirigami.Separator {
+                Kirigami.FormData.isSection: true
+                Kirigami.FormData.label: "Badge text"
+            }
+        }
+
+        Kirigami.InlineMessage {
+            Layout.fillWidth: true
+            text: "By default, the badge adapts to the icon size. Choose 'Wrap text' to let text wrap to multiple lines, or 'Fit width' to expand the badge to fit the text.\nIf the label get a weird shape try restarting plasma."
+            visible: true
+        }
+
+        Kirigami.FormLayout {
+            Controls.CheckBox {
+                id: wrapText
+                Kirigami.FormData.label: "Wrap text: "
+                checked: false
+                onCheckedChanged: {
+                    if (checked) widthFit.checked = false
+                }
+            }
+
+            Controls.CheckBox {
+                id: widthFit
+                Kirigami.FormData.label: "Fit width to text: "
+                checked: false
+                onCheckedChanged: {
+                    if (checked) wrapText.checked = false
+                }
+            }
         }
 
         Kirigami.FormLayout {

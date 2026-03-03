@@ -29,6 +29,9 @@ Item {
   property bool isPanelVertical: plasmoid.formFactor === PlasmaCore.Types.Vertical
   readonly property bool inTray: parent.objectName === "org.kde.desktop-CompactApplet"
 
+  property bool wrapText: plasmoid.configuration.wrapText
+  property bool widthFit: plasmoid.configuration.widthFit
+
   property real itemSize: Math.min(row.height, row.width)
 
   // updates the icon according to the refresh status
@@ -140,7 +143,7 @@ Item {
       }
     }
 
-    WorkspaceComponents.BadgeOverlay { // for the horizontal bar
+    Components.BadgeOverlay { // for the horizontal bar
       anchors {
         bottom: container.bottom
         right: container.right
@@ -148,9 +151,11 @@ Item {
       text: generateResult()
       visible: !isPanelVertical && !mainDot
       icon: icon
+      wrapText: row.wrapText
+      widthFit: row.widthFit
     }
 
-    WorkspaceComponents.BadgeOverlay { // for the vertical bar
+    Components.BadgeOverlay { // for the vertical bar
       anchors {
         verticalCenter: container.bottom
         right: container.right
@@ -158,6 +163,8 @@ Item {
       text: generateResult()
       visible: isPanelVertical && !mainDot
       icon: icon
+      wrapText: row.wrapText
+      widthFit: row.widthFit
     }
 
     MouseArea {
