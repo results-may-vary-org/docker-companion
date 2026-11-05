@@ -28,6 +28,66 @@ PlasmaExtras.Representation {
   property bool isUpdating: false
   property bool onError: false
   property string errorMessage: ""
+  property bool groupByProject: plasmoid.configuration.groupByProject
+  property int modelRevision: 0
+
+  onGroupByProjectChanged: {
+    injectList(full.list)
+  }
+
+  function extractProject(containerData) {
+    if (!containerData) return "Standalone"
+    const labels = containerData.Labels
+    if (!labels) return "Standalone"
+
+    if (typeof labels === "object") {
+      const proj = labels["com.docker.compose.project"] || labels["com.docker.stack.namespace"]
+      return (proj && typeof proj === "string" && proj.trim() !== "") ? proj.trim() : "Standalone"
+    }
+
+    if (typeof labels === "string" && labels.trim() !== "") {
+      const match = labels.match(/(?:^|,)\s*(?:com\.docker\.compose\.project|com\.docker\.stack\.namespace)=([^,]+)/)
+      if (match && match[1]) {
+        const proj = match[1].trim()
+        if (proj) return proj
+      }
+    }
+
+    return "Standalone"
+  }
+
+  function isProjectRunning(projectName, rev) {
+    for (let i = 0; i < dockerListModel.count; i++) {
+      const item = dockerListModel.get(i)
+      if (item.project === projectName && item.isRunning) {
+        return true
+      }
+    }
+    return false
+  }
+
+  function toggleProject(projectName) {
+    const running = isProjectRunning(projectName, full.modelRevision)
+    const startCmd = main.startOneDocker
+    const stopCmd = main.stopOneDocker
+    const ids = []
+
+    for (let i = 0; i < dockerListModel.count; i++) {
+      const item = dockerListModel.get(i)
+      if (item.project === projectName) {
+        if (running && item.isRunning) {
+          ids.push(item.id)
+        } else if (!running && !item.isRunning) {
+          ids.push(item.id)
+        }
+      }
+    }
+
+    if (ids.length > 0) {
+      const cmd = running ? stopCmd : startCmd
+      cmdSource.exec(`${cmd} ${ids.join(" ")}`)
+    }
+  }
 
   Connections {
     target: cmdSource
@@ -90,6 +150,7 @@ PlasmaExtras.Representation {
           const isRunning = containerData.State === "running"
           datas.push({
             "name": containerData.Names || "unknown",
+            "project": extractProject(containerData),
             "id": containerData.ID || "unknown",
             "status": containerData.Status || "unknown",
             "state": containerData.State || "unknown",
@@ -112,6 +173,13 @@ PlasmaExtras.Representation {
       }
     }
     datas.sort((a, b) => {
+      if (full.groupByProject) {
+        if (a.project !== b.project) {
+          if (a.project === "Standalone") return 1
+          if (b.project === "Standalone") return -1
+          return a.project.localeCompare(b.project)
+        }
+      }
       if (a.isRunning !== b.isRunning) {
         return b.isRunning - a.isRunning
       }
@@ -121,6 +189,7 @@ PlasmaExtras.Representation {
     // first load: nothing to diff
     if (dockerListModel.count === 0) {
       dockerListModel.append(datas)
+      full.modelRevision++
       return
     }
 
@@ -156,6 +225,7 @@ PlasmaExtras.Representation {
         }
       }
     }
+    full.modelRevision++
   }
 
   // only update the relevant data on the list
@@ -200,7 +270,25 @@ PlasmaExtras.Representation {
 
     RowLayout {
       Layout.alignment: Qt.AlignLeft
-      spacing: 0
+      spacing: 8
+
+      PlasmaComponents.ToolButton {
+        id: toggleGroupBtn
+        height: Kirigami.Units.iconSizes.medium
+        icon.name: full.groupByProject ? "view-list-tree-symbolic" : "view-list-details-symbolic"
+        display: PlasmaComponents.AbstractButton.IconOnly
+        text: full.groupByProject ? i18n("Switch to flat list") : i18n("Group by project")
+        visible: !isUpdating && full.isActive
+        checkable: true
+        checked: full.groupByProject
+        onClicked: {
+          full.groupByProject = !full.groupByProject
+          plasmoid.configuration.groupByProject = full.groupByProject
+        }
+        PlasmaComponents.ToolTip {
+          text: parent.text
+        }
+      }
 
       Controls.Label {
         height: Kirigami.Units.iconSizes.medium
@@ -253,6 +341,7 @@ PlasmaExtras.Representation {
           text: parent.text
         }
       }
+
     }
   }
 
@@ -287,6 +376,25 @@ PlasmaExtras.Representation {
       highlightResizeDuration: Kirigami.Units.shortDuration
       model: dockerListModel
       delegate: Components.DockerListItem {}
+      section.property: full.groupByProject ? "project" : ""
+      section.criteria: ViewSection.FullString
+      section.delegate: PlasmaExtras.ListSectionHeader {
+        id: sectionHeader
+        required property string section
+        width: packageView.width
+        label: section
+
+        PlasmaComponents.ToolButton {
+          Layout.alignment: Qt.AlignVCenter
+          icon.name: full.isProjectRunning(sectionHeader.section, full.modelRevision) ? "media-playback-stop" : "media-playback-start"
+          display: PlasmaComponents.AbstractButton.IconOnly
+          text: full.isProjectRunning(sectionHeader.section, full.modelRevision) ? i18n("Stop project containers") : i18n("Start project containers")
+          onClicked: full.toggleProject(sectionHeader.section)
+          PlasmaComponents.ToolTip {
+            text: parent.text
+          }
+        }
+      }
       Keys.onDownPressed: event => {
         scrollView.incrementCurrentIndex();
         scrollView.currentItem.forceActiveFocus();

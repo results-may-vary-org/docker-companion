@@ -51,6 +51,10 @@
 </group>
 
 <group name="displayConfigPage">
+  <entry name="groupByProject" type="Bool">
+    <default>true</default>
+  </entry>
+
   <entry name="separateResult" type="Bool">
     <default>true</default>
   </entry>
