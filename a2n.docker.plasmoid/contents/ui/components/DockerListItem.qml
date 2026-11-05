@@ -67,6 +67,12 @@ PlasmaExtras.ExpandableListItem {
   // list of btn for infos
   contextualActions: [
     Action {
+      text: `Project: ${model.project}`
+      icon.name: "folder-symbolic"
+      enabled: Boolean(model.project && model.project !== "Standalone")
+      onTriggered: copy(model.project)
+    },
+    Action {
       text: `ID: ${model.id}`
       icon.name: iconMapping["ID"]
       onTriggered: copy(model.id)
